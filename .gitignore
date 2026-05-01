@@ -1,0 +1,18 @@
+# Build output binaries
+dist/
+
+# Go build artifacts
+*.exe
+fgit
+
+# Test coverage output
+coverage.out
+coverage.html
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
