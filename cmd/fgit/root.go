@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/stephenhstewart/fgit/internal/dispatch"
 	"github.com/stephenhstewart/fgit/internal/runner"
 )
 
@@ -32,7 +33,10 @@ func NewRootCommand() *cobra.Command {
 		DisableFlagParsing: false,
 		Args:               cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runner.Run("git", args)
+			d := dispatch.New(func(gitArgs []string) error {
+				return runner.Run("git", gitArgs)
+			})
+			return d.Dispatch(args)
 		},
 		// Silence usage output on error; let git handle its own messages
 		SilenceUsage:  true,
