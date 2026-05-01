@@ -44,6 +44,7 @@ func NewRootCommand() *cobra.Command {
 	}
 
 	root.AddCommand(newAliasesCommand())
+	root.AddCommand(newVersionCommand())
 	return root
 }
 
