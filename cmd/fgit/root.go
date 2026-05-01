@@ -43,6 +43,7 @@ func NewRootCommand() *cobra.Command {
 		SilenceErrors: true,
 	}
 
+	root.AddCommand(newAliasesCommand())
 	return root
 }
 
