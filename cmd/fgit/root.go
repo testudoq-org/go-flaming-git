@@ -29,8 +29,10 @@ func NewRootCommand() *cobra.Command {
  Run 'fgit aliases' for the full alias reference.`,
 		// Disable default completion command
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
-		// Pass unknown args through to git
-		DisableFlagParsing: false,
+		// DisableFlagParsing passes all args to RunE so git flags like --oneline
+		// are not intercepted by Cobra. Subcommands (aliases, version) are still
+		// matched by Cobra before RunE is reached.
+		DisableFlagParsing: true,
 		Args:               cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			d := dispatch.New(func(gitArgs []string) error {
