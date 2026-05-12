@@ -16,6 +16,28 @@ Create a lightweight, standalone, cross-platform Git wrapper called **Flaming Gi
 - Work reliably on Windows (primary dev), Linux (WSL), and macOS
 - Use `fgit` as main binary name (`fg` as optional short alias)
 
+### Quality Gate Strategy
+
+All build and CI flows enforce this gate order:
+- `go test ./...`
+- `go test ./... -coverprofile=coverage.out`
+- `go run ./cmd/cover2lcov -in coverage.out -out coverage.lcov`
+- `go vet ./...`
+- `golangci-lint run`
+- build `crap` from `https://github.com/testudoq-org/go-crap4go`
+- `crap cmd/fgit internal/alias internal/dispatch internal/runner --no-run-tests --coverprofile=coverage.out --threshold=15`
+
+CRAP score policy:
+- Tolerance zone is below 15
+- Any function at 15 or above is a failing condition
+
+When CRAP fails, teams must run an investigation loop:
+- capture failing functions from `crap-report.txt`
+- perform root cause analysis per function
+- add failing tests for risky or uncovered paths first
+- apply minimal refactors and retest
+- repeat until all functions are below 15
+
 ---
 
 ### Overall Development Phases (Recommended Order)

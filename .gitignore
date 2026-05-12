@@ -8,6 +8,8 @@ fgit
 # Test coverage output
 coverage.out
 coverage.html
+coverage.lcov
+crap-report.txt
 
 # Editor and OS files
 .DS_Store

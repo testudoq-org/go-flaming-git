@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+      - prompt/**
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Download modules
+        run: go mod download
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          install-mode: binary
+          args: --version
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Generate coverage profile
+        run: go test ./... -coverprofile=coverage.out
+
+      - name: Generate LCOV report
+        run: go run ./cmd/cover2lcov -in coverage.out -out coverage.lcov
+
+      - name: Run vet
+        run: go vet ./...
+
+      - name: Run lint
+        run: golangci-lint run
+
+      - name: Run CRAP gate (threshold 15)
+        run: |
+          git clone --depth 1 https://github.com/testudoq-org/go-crap4go.git /tmp/go-crap4go
+          cd /tmp/go-crap4go
+          go build -o /tmp/crap ./cmd/crap
+          cd "$GITHUB_WORKSPACE"
+          /tmp/crap cmd/fgit internal/alias internal/dispatch internal/runner --no-run-tests --coverprofile=coverage.out --threshold=15 | tee crap-report.txt
+
+      - name: Upload quality artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            coverage.out
+            coverage.lcov
+            crap-report.txt
