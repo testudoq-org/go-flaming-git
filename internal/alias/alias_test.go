@@ -181,3 +181,54 @@ func TestExpandCompound_Sync(t *testing.T) {
 		t.Fatalf("expected 2 steps for sync, got %d", len(steps))
 	}
 }
+
+func TestExpandCompound_Review(t *testing.T) {
+	steps, ok := alias.ExpandCompound("review")
+	if !ok {
+		t.Fatal("expected review to be a compound command")
+	}
+	if len(steps) != 2 {
+		t.Fatalf("expected 2 steps for review, got %d", len(steps))
+	}
+	if got := steps[0].Args; len(got) != 1 || got[0] != "status" {
+		t.Fatalf("expected review step 1 to be status, got %v", got)
+	}
+	if got := steps[1].Args; len(got) != 1 || got[0] != "diff" {
+		t.Fatalf("expected review step 2 to be diff, got %v", got)
+	}
+}
+
+func TestExpandCompound_Amendit(t *testing.T) {
+	steps, ok := alias.ExpandCompound("amendit")
+	if !ok {
+		t.Fatal("expected amendit to be a compound command")
+	}
+	if len(steps) != 2 {
+		t.Fatalf("expected 2 steps for amendit, got %d", len(steps))
+	}
+	if got := steps[0].Args; len(got) != 2 || got[0] != "add" || got[1] != "-A" {
+		t.Fatalf("expected amendit step 1 to be add -A, got %v", got)
+	}
+	if got := steps[1].Args; len(got) != 3 || got[0] != "commit" || got[1] != "--amend" || got[2] != "--no-edit" {
+		t.Fatalf("expected amendit step 2 to be commit --amend --no-edit, got %v", got)
+	}
+	if steps[1].AppendUserArgs {
+		t.Fatal("expected amendit not to append user args")
+	}
+}
+
+func TestExpandCompound_RekindleAll(t *testing.T) {
+	steps, ok := alias.ExpandCompound("rekindle-all")
+	if !ok {
+		t.Fatal("expected rekindle-all to be a compound command")
+	}
+	if len(steps) != 2 {
+		t.Fatalf("expected 2 steps for rekindle-all, got %d", len(steps))
+	}
+	if got := steps[0].Args; len(got) != 2 || got[0] != "add" || got[1] != "-A" {
+		t.Fatalf("expected rekindle-all step 1 to be add -A, got %v", got)
+	}
+	if got := steps[1].Args; len(got) != 3 || got[0] != "commit" || got[1] != "--amend" || got[2] != "--no-edit" {
+		t.Fatalf("expected rekindle-all step 2 to be commit --amend --no-edit, got %v", got)
+	}
+}
